@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="referrer" content="no-referrer">
+<title>Video Player</title>
+
+<!-- Google Analytics -->
+<!-- Pastikan ID ini benar. Sebelumnya ada dua ID berbeda (G-2XMZNLZYX6 dan G-2EMZHLZYX6). -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-2XMZNLZYX6"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){ dataLayer.push(arguments); }
+gtag('js', new Date());
+gtag('config', 'G-2XMZNLZYX6');
+</script>
+
+<style>
+body{
+    margin:0;
+    background:#000;
+}
+
+video{
+    width:100%;
+    height:100vh;
+    object-fit:contain;
+    background:#000;
+}
+
+#message{
+    display:none;
+    position:absolute;
+    top:40px;
+    left:0;
+    right:0;
+    padding:0 20px;
+    color:#fff;
+    text-align:center;
+    font-family:sans-serif;
+}
+</style>
+</head>
+
+<body>
+
+<video id="player" controls playsinline controlsList="nodownload"></video>
+<div id="message"></div>
+
+<script>
+/* =========================
+   KONFIGURASI
+========================= */
+
+const JSON_URL = "videos.json";
+
+/* SMART LINK */
+const DIRECT_LINK =
+"https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
+
+/* SHOPEE */
+const SHOPEE_LINK =
+"https://s.shopee.co.id/Lo9Rjiqzh";
+
+const video = document.getElementById("player");
+const messageBox = document.getElementById("message");
+
+let clicked = false;
+let redirected = false;
+
+
+/* =========================
+   TAMPILKAN PESAN
+========================= */
+
+function showMessage(text){
+    messageBox.textContent = text;
+    messageBox.style.display = "block";
+}
+
+
+/* =========================
+   PILIH IKLAN RANDOM
+========================= */
+
+function getRandomAd(){
+    const ads = [DIRECT_LINK, SHOPEE_LINK];
+    const randomIndex = Math.floor(Math.random() * ads.length);
+    return ads[randomIndex];
+}
+
+
+/* =========================
+   REDIRECT RANDOM
+========================= */
+
+function redirectRandom(){
+    if(redirected) return;
+    redirected = true;
+    window.location.href = getRandomAd();
+}
+
+
+/* =========================
+   AMBIL ID VIDEO DINAMIS
+========================= */
+
+const id = decodeURIComponent(
+    window.location.hash.replace(/^#\/?/, '')
+);
+
+
+/* =========================
+   HANDLE ERROR VIDEO
+   (dipasang sekali, di luar fetch)
+========================= */
+
+const MEDIA_ERRORS = {
+    1: "Pemutaran dibatalkan.",
+    2: "Gangguan jaringan saat memuat video.",
+    3: "Video rusak atau gagal didekode.",
+    4: "Format video tidak didukung atau URL bukan file video langsung."
+};
+
+video.addEventListener("error", function(){
+    const code = video.error ? video.error.code : null;
+
+    console.log("URL video:", video.currentSrc || video.src);
+    console.log("Video error code:", code);
+    console.log("Video error message:", video.error ? video.error.message : "");
+
+    showMessage(MEDIA_ERRORS[code] || "Video gagal diputar.");
+});
+
+
+/* =========================
+   LOAD VIDEOS.JSON
+========================= */
+
+fetch(JSON_URL)
+.then(res => {
+    if(!res.ok){
+        throw new Error("Gagal mengambil videos.json");
+    }
+    return res.json();
+})
+.then(data => {
+    const vids = data.videos || [];
+    const selected = vids.find(v => v.id === id);
+
+    if(!selected){
+        video.style.display = "none";
+        showMessage("Video tidak ditemukan");
+        return;
+    }
+
+    video.src = selected.cdn;
+    video.load();
+})
+.catch(error => {
+    console.error(error);
+    video.style.display = "none";
+    showMessage("Gagal memuat video");
+});
+
+
+/* =========================
+   KLIK VIDEO
+========================= */
+
+video.addEventListener("click", function(){
+
+    /* KLIK PERTAMA */
+    if(!clicked){
+        clicked = true;
+        return;
+    }
+
+    /* KLIK KEDUA DAN SETERUSNYA */
+    redirectRandom();
+});
+
+
+/* =========================
+   REDIRECT SETELAH 5 DETIK
+========================= */
+
+video.addEventListener("timeupdate", function(){
+    if(!redirected && video.currentTime >= 5){
+        SHOPEE_LINK();
+    }
+});
+</script>
+
+</body>
+</html>
