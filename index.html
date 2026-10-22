@@ -167,18 +167,14 @@
     // Atur link Shopee jika sudah tersedia.
     const bottomAd = document.getElementById("adBottom");
 
-    if (SHOPEE_LINK.trim()) {
-      bottomAd.href = SHOPEE_LINK;
-    } else {
-      bottomAd.addEventListener("click", function(event) {
-        if (!event.target.closest(".close-ad")) {
-          event.preventDefault();
-          statusText.textContent =
-            "Link Shopee belum dipasang. Isi SHOPEE_LINK di index.html.";
-        }
-      });
-    }
-
+// Pilih link Shopee secara acak untuk banner bawah
+if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
+  const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
+  bottomAd.href = SHOPEE_LINKS[randomIndex];
+} else {
+  bottomAd.href = "#";
+}
+    
     // Tombol tutup banner.
     document.querySelectorAll(".close-ad").forEach(function(button) {
       button.addEventListener("click", function(event) {
