@@ -232,7 +232,7 @@ if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
           return item.id === id;
         });
 
-        if (!selected  !selected.cdn) {
+        if (!selected && !selected.cdn) {
           statusText.textContent = "Video tidak ditemukan.";
           return;
         }
@@ -267,8 +267,8 @@ if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
 let sudahRedirect = false;
 
 video.addEventListener("timeupdate", function () {
-  if (sudahRedirect  video.paused) return;
-
+  if (sudahRedirect) return;
+  if (video.paused) return;
   if (video.currentTime >= 15) {
    const links = SHOPEE_LINKS.filter(link =>
   /^https:\/\/s\.shopee\.co\.id\/[A-Za-z0-9]+\/?$/.test(link.trim())
