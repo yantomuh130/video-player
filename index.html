@@ -169,10 +169,11 @@
 
 // Pilih link Shopee secara acak untuk banner bawah
 if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
-  const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
-  bottomAd.href = SHOPEE_LINKS[randomIndex];
+    const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
+    bottomAd.href = SHOPEE_LINKS[randomIndex];
+    bottomAd.target = "_blank";
 } else {
-  bottomAd.href = "#";
+    bottomAd.href = "#";
 }
     
     // Tombol tutup banner.
