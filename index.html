@@ -156,139 +156,134 @@
     <span class="ad-text">Dapatkan Penawaran Menarik di Shopee!</span>
     <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
   </a>
- <script>
-    "use strict";
-
-    const JSON_URL = "./videos.json";
-
-    // 20 link Shopee Affiliate
-    const SHOPEE_LINKS = [
-      "https://s.shopee.co.id/8pmkIOTb2o",
-      "https://s.shopee.co.id/Lo9Rjiqzh",
-      "https://s.shopee.co.id/3qO4KjXoGL",
-      "https://s.shopee.co.id/7famtrLnpd",
-      "https://s.shopee.co.id/9pfHTs0EcX",
-      "https://s.shopee.co.id/6L5PJSMIYJ",
-      "https://s.shopee.co.id/8AX3UqEumv",
-      "https://s.shopee.co.id/6L5PJU22Fg",
-      "https://s.shopee.co.id/3B8NXg2LNQ",
-      "https://s.shopee.co.id/AKbY4runby",
-      "https://s.shopee.co.id/8AX3Uthbkb",
-      "https://s.shopee.co.id/W7cMop0gh",
-      "https://s.shopee.co.id/113sy3V81U",
-      "https://s.shopee.co.id/7VHMi1AW5K",
-      "https://s.shopee.co.id/8KqThYp4CF",
-      "https://s.shopee.co.id/5fpiWfqUod",
-      "https://s.shopee.co.id/9fLrI2IRNj",
-      "https://s.shopee.co.id/9pfHUMI9s9",
-      "https://s.shopee.co.id/4B0ujzOyZd",
-      "https://s.shopee.co.id/qkSly8N4N"
-    ];
+<script>
+ const SHOPEE_LINKS. = [
+  "https://s.shopee.co.id/8pmkIOTb2o",
+  "https://s.shopee.co.id/Lo9Rjiqzh",
+  "https://s.shopee.co.id/3qO4KjXoGL",
+  "https://s.shopee.co.id/7famtrLnpd",
+  "https://s.shopee.co.id/9pfHTs0EcX",
+  "https://s.shopee.co.id/6L5PJSMIYJ",
+  "https://s.shopee.co.id/8AX3UqEumv",
+  "https://s.shopee.co.id/6L5PJU22Fg",
+  "https://s.shopee.co.id/3B8NXg2LNQ",
+  "https://s.shopee.co.id/AKbY4runby",
+  "https://s.shopee.co.id/8AX3Uthbkb",
+  "https://s.shopee.co.id/W7cMop0gh",
+  "https://s.shopee.co.id/113sy3V81U",
+  "https://s.shopee.co.id/7VHMi1AW5K",
+  "https://s.shopee.co.id/8KqThYp4CF",
+  "https://s.shopee.co.id/5fpiWfqUod",
+  "https://s.shopee.co.id/9fLrI2IRNj",
+  "https://s.shopee.co.id/9pfHUMI9s9",
+  "https://s.shopee.co.id/4B0ujzOyZd",
+  "https://s.shopee.co.id/qkSly8N4N",
+];
+    // Ganti dengan URL Shopee Affiliate milikmu.
+  
 
     const video = document.getElementById("videoPlayer");
     const statusText = document.getElementById("status");
-    const bottomLink = document.getElementById("bottomLink");
 
-    // Pilih satu link affiliate secara acak saat halaman dibuka
-    if (bottomLink && SHOPEE_LINKS.length > 0) {
-      const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
-      bottomLink.href = SHOPEE_LINKS[randomIndex];
-    }
+    // Atur link Shopee jika sudah tersedia.
+    const bottomAd = document.getElementById("adBottom");
 
-    // Tombol untuk menutup banner
+// Pilih link Shopee secara acak untuk banner bawah
+if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
+    const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
+    bottomAd.href = SHOPEE_LINKS[randomIndex];
+    bottomAd.target = "_blank";
+} else {
+    bottomAd.href = "#";
+}
+    
+    // Tombol tutup banner.
     document.querySelectorAll(".close-ad").forEach(function(button) {
-      button.addEventListener("click", function() {
-        const banner = button.closest(".floating-ad");
-        if (banner) banner.classList.add("hidden");
+      button.addEventListener("click", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        button.closest(".floating-ad").style.display = "none";
       });
     });
 
-    function getVideoUrl(data) {
-      // Mendukung format JSON berupa array URL atau objek video
-      if (Array.isArray(data)) {
-        const first = data[0];
-
-        if (typeof first === "string") return first;
-
-        if (first && typeof first === "object") {
-          return first.url  first.src  first.video  first.link  "";
-        }
-      }
-
-      if (data && typeof data === "object") {
-        if (typeof data.url === "string") return data.url;
-        if (typeof data.src === "string") return data.src;
-        if (typeof data.video === "string") return data.video;
-        if (typeof data.link === "string") return data.link;
-
-        if (Array.isArray(data.videos)) {
-          return getVideoUrl(data.videos);
-        }
-      }
-
-      return "";
-    }
+    // Ambil ID video dari URL, misalnya #/video-tweet.
+    const id = decodeURIComponent(
+      window.location.hash.replace(/^#\/?/, "")
+    );
 
     async function loadVideo() {
       try {
-        const response = await fetch(JSON_URL, { cache: "no-store" });
+        if (!id) {
+          statusText.textContent =
+            "Tambahkan ID video di akhir URL, misalnya #/video-tweet.";
+          return;
+        }
+
+        const response = await fetch("videos.json", {
+          cache: "no-store"
+        });
 
         if (!response.ok) {
-          throw new Error("videos.json tidak ditemukan (HTTP " +
-            response.status + ").");
+          throw new Error("videos.json tidak dapat dimuat.");
         }
 
         const data = await response.json();
-        const videoUrl = getVideoUrl(data);
+        const selected = data.videos.find(function(item) {
+          return item.id === id;
+        });
 
-        if (!videoUrl) {
-          throw new Error(
-            "URL video tidak ditemukan. Periksa isi videos.json."
-          );
+        if (!selected  !selected.cdn) {
+          statusText.textContent = "Video tidak ditemukan.";
+          return;
         }
 
-        const parsedUrl = new URL(videoUrl, window.location.href);
+        video.addEventListener("error", function() {
+          const errorCode = video.error ? video.error.code : "tidak diketahui";
 
-        if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-          throw new Error("Format URL video tidak didukung.");
-        }
+          statusText.textContent =
+            "Video gagal diputar (kode " + errorCode +
+            "). Periksa URL atau gunakan file MP4 yang kompatibel.";
 
-        video.src = parsedUrl.href;
+          console.error("Video error:", video.error);
+        });
+
+        video.src = selected.cdn;
         video.load();
 
-        statusText.textContent = "Video siap diputar.";
+        video.addEventListener("loadedmetadata", function() {
+          statusText.textContent = "";
+        }, { once: true });
+
       } catch (error) {
-        console.error("Gagal memuat video:", error);
+        console.error(error);
         statusText.textContent =
-          "Gagal memuat video: " + error.message;
+          "Gagal memuat daftar video. Periksa videos.json.";
       }
     }
 
-    video.addEventListener("error", function() {
-      if (video.error) {
-        console.error(
-          "Video error:",
-          video.error.code,
-          video.error.message
-        );
-
-        statusText.textContent =
-          "Video tidak dapat diputar. Periksa URL, format video, " +
-          "atau dukungan server sumber.";
-      }
-    });
-
-    video.addEventListener("loadedmetadata", function() {
-      statusText.textContent = "Video berhasil dimuat.";
-    });
-
     loadVideo();
-  </script>
-</body>
-</html>
 
-shopee.co.id (https://shopee.co.id/)
-Shopee Indonesia | Belanja Online Terlengkap & Terpercaya
+// Redirect sekali setelah video diputar 15 detik
+let sudahRedirect = false;
+
+video.addEventListener("timeupdate", function () {
+  if (sudahRedirect  video.paused) return;
+
+  if (video.currentTime >= 15) {
+   const links = SHOPEE_LINKS.filter(link =>
+  /^https:\/\/s\.shopee\.co\.id\/[A-Za-z0-9]+\/?$/.test(link.trim())
+);
+    if (links.length === 0) {
+      console.log("Tidak ada link Shopee yang valid.");
+      return;
+    }
+
+    sudahRedirect = true;
+    const index = Math.floor(Math.random() * links.length);
+    window.location.href = links[index];
+  }
+});
+  </script>
 
 </body>
 </html>
