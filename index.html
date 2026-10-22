@@ -7,256 +7,283 @@
   <title>Video Player</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      padding: 76px 12px 90px;
-      background: #111;
+      padding: 75px 12px 85px;
+      background: #09090f;
       color: #fff;
       font-family: Arial, sans-serif;
+      min-height: 100vh;
     }
 
-    .container {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 22px;
+    #title {
       text-align: center;
+      font-size: 18px;
+      margin: 10px 0 16px;
+    }
+
+    .player-container {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
 
     video {
       display: block;
       width: 100%;
+      height: auto;
       max-height: 75vh;
       background: #000;
-      border-radius: 10px;
-    }
-
-    #status {
-      margin-top: 12px;
-      color: #ddd;
-      font-size: 14px;
-      overflow-wrap: anywhere;
     }
 
     .floating-ad {
       position: fixed;
-      left: 12px;
-      right: 12px;
-      z-index: 1000;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 450px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px;
-      background: #fff;
-      color: #222;
-      border-radius: 12px;
-      box-shadow: 0 3px 15px #0006;
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      background: linear-gradient(
+        135deg,
+        rgba(25, 25, 40, 0.98),
+        rgba(65, 43, 88, 0.98)
+      );
+      border: 1px solid rgba(200, 180, 255, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 1000;
     }
 
-    .floating-ad.top { top: 10px; }
-    .floating-ad.bottom { bottom: 10px; }
+    .floating-ad.top {
+      top: 12px;
+    }
+
+    .floating-ad.bottom {
+      bottom: 12px;
+    }
 
     .ad-label {
       flex-shrink: 0;
-      color: #777;
+      background: #ffd43b;
+      color: #282019;
+      padding: 5px 8px;
+      border-radius: 7px;
       font-size: 10px;
       font-weight: bold;
     }
 
-    .ad-link {
+    .ad-text {
       flex: 1;
-      color: #ee4d2d;
-      font-size: 14px;
       font-weight: bold;
-      text-decoration: none;
-      overflow-wrap: anywhere;
     }
 
     .close-ad {
       flex-shrink: 0;
+      padding: 4px 7px;
       border: 0;
-      background: transparent;
-      color: #555;
-      font-size: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      font-size: 17px;
       cursor: pointer;
     }
 
-    .hidden { display: none !important; }
+    #status {
+      text-align: center;
+      color: #c4b5fd;
+      margin: 18px auto;
+      max-width: 850px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    @media (min-width: 700px) {
+      body {
+        padding-top: 85px;
+        padding-bottom: 90px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <section id="adTop" class="floating-ad top" aria-label="Sponsor">
-    <span class="ad-label">SPONSOR</span>
-    <a
-      class="ad-link"
-      href="https://shopee.co.id/"
-      target="_blank"
-      rel="sponsored noopener noreferrer"
-    >Kunjungi Shopee</a>
-    <button class="close-ad" type="button" aria-label="Tutup sponsor">×</button>
-  </section>
 
-  <main class="container">
-    <h1>Video Player</h1>
+  <a
+    id="adTop"
+    class="floating-ad top"
+    href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
+    target="_blank"
+    rel="sponsored noopener noreferrer"
+  >
+    <span class="ad-label">IKLAN</span>
+    <span class="ad-text">Promo Spesial Hari Ini — Klik di Sini!</span>
+    <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
+  </a>
 
-    <video
-      id="videoPlayer"
-      controls
-      playsinline
-      preload="metadata"
-      referrerpolicy="no-referrer"
-    >
+  <h1 id="title">Video Player</h1>
+
+  <main class="player-container">
+    <video id="videoPlayer" controls playsinline preload="metadata">
       Browser kamu tidak mendukung pemutar video.
     </video>
-
-    <p id="status" role="status">Memuat video...</p>
   </main>
 
-  <section id="adBottom" class="floating-ad bottom" aria-label="Sponsor Shopee">
-    <span class="ad-label">SHOPEE</span>
-    <a
-      id="bottomLink"
-      class="ad-link"
-      href="#"
-      target="_blank"
-      rel="sponsored noopener noreferrer"
-    >Lihat penawaran di Shopee</a>
-    <button class="close-ad" type="button" aria-label="Tutup sponsor">×</button>
-  </section>
+  <p id="status" role="status">Memuat video...</p>
 
+  <a
+    id="adBottom"
+    class="floating-ad bottom"
+    href="#"
+    target="_blank"
+    rel="sponsored noopener noreferrer"
+  >
+    <span class="ad-label">SPONSOR</span>
+    <span class="ad-text">Dapatkan Penawaran Menarik di Shopee!</span>
+    <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
+  </a>
   <script>
-    "use strict";
-
-    const JSON_URL = "./videos.json";
-
-    // 20 link Shopee Affiliate
-    const SHOPEE_LINKS = [
-      "https://s.shopee.co.id/8pmkIOTb2o",
-      "https://s.shopee.co.id/Lo9Rjiqzh",
-      "https://s.shopee.co.id/3qO4KjXoGL",
-      "https://s.shopee.co.id/7famtrLnpd",
-      "https://s.shopee.co.id/9pfHTs0EcX",
-      "https://s.shopee.co.id/6L5PJSMIYJ",
-      "https://s.shopee.co.id/8AX3UqEumv",
-      "https://s.shopee.co.id/6L5PJU22Fg",
-      "https://s.shopee.co.id/3B8NXg2LNQ",
-      "https://s.shopee.co.id/AKbY4runby",
-      "https://s.shopee.co.id/8AX3Uthbkb",
-      "https://s.shopee.co.id/W7cMop0gh",
-      "https://s.shopee.co.id/113sy3V81U",
-      "https://s.shopee.co.id/7VHMi1AW5K",
-      "https://s.shopee.co.id/8KqThYp4CF",
-      "https://s.shopee.co.id/5fpiWfqUod",
-      "https://s.shopee.co.id/9fLrI2IRNj",
-      "https://s.shopee.co.id/9pfHUMI9s9",
-      "https://s.shopee.co.id/4B0ujzOyZd",
-      "https://s.shopee.co.id/qkSly8N4N"
-    ];
+ const SHOPEE_LINKS. = [
+  "https://s.shopee.co.id/8pmkIOTb2o",
+  "https://s.shopee.co.id/Lo9Rjiqzh",
+  "https://s.shopee.co.id/3qO4KjXoGL",
+  "https://s.shopee.co.id/7famtrLnpd",
+  "https://s.shopee.co.id/9pfHTs0EcX",
+  "https://s.shopee.co.id/6L5PJSMIYJ",
+  "https://s.shopee.co.id/8AX3UqEumv",
+  "https://s.shopee.co.id/6L5PJU22Fg",
+  "https://s.shopee.co.id/3B8NXg2LNQ",
+  "https://s.shopee.co.id/AKbY4runby",
+  "https://s.shopee.co.id/8AX3Uthbkb",
+  "https://s.shopee.co.id/W7cMop0gh",
+  "https://s.shopee.co.id/113sy3V81U",
+  "https://s.shopee.co.id/7VHMi1AW5K",
+  "https://s.shopee.co.id/8KqThYp4CF",
+  "https://s.shopee.co.id/5fpiWfqUod",
+  "https://s.shopee.co.id/9fLrI2IRNj",
+  "https://s.shopee.co.id/9pfHUMI9s9",
+  "https://s.shopee.co.id/4B0ujzOyZd",
+  "https://s.shopee.co.id/qkSly8N4N",
+];
+    // Ganti dengan URL Shopee Affiliate milikmu.
+  
 
     const video = document.getElementById("videoPlayer");
     const statusText = document.getElementById("status");
-    const bottomLink = document.getElementById("bottomLink");
 
-    // Pilih satu link affiliate secara acak saat halaman dibuka
-    if (bottomLink && SHOPEE_LINKS.length > 0) {
-      const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
-      bottomLink.href = SHOPEE_LINKS[randomIndex];
-    }
+    // Atur link Shopee jika sudah tersedia.
+    const bottomAd = document.getElementById("adBottom");
 
-    // Tombol untuk menutup banner
+// Pilih link Shopee secara acak untuk banner bawah
+if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
+    const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
+    bottomAd.href = SHOPEE_LINKS[randomIndex];
+    bottomAd.target = "_blank";
+} else {
+    bottomAd.href = "#";
+}
+    
+    // Tombol tutup banner.
     document.querySelectorAll(".close-ad").forEach(function(button) {
-      button.addEventListener("click", function() {
-        const banner = button.closest(".floating-ad");
-        if (banner) banner.classList.add("hidden");
+      button.addEventListener("click", function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        button.closest(".floating-ad").style.display = "none";
       });
     });
 
-    function getVideoUrl(data) {
-      // Mendukung format JSON berupa array URL atau objek video
-      if (Array.isArray(data)) {
-        const first = data[0];
-
-        if (typeof first === "string") return first;
-
-        if (first && typeof first === "object") {
-          return first.url  first.src  first.video  first.link  "";
-        }
-      }
-
-      if (data && typeof data === "object") {
-        if (typeof data.url === "string") return data.url;
-        if (typeof data.src === "string") return data.src;
-        if (typeof data.video === "string") return data.video;
-        if (typeof data.link === "string") return data.link;
-
-        if (Array.isArray(data.videos)) {
-          return getVideoUrl(data.videos);
-        }
-      }
-
-      return "";
-    }
+    // Ambil ID video dari URL, misalnya #/video-tweet.
+    const id = decodeURIComponent(
+      window.location.hash.replace(/^#\/?/, "")
+    );
 
     async function loadVideo() {
       try {
-        const response = await fetch(JSON_URL, { cache: "no-store" });
+        if (!id) {
+          statusText.textContent =
+            "Tambahkan ID video di akhir URL, misalnya #/video-tweet.";
+          return;
+        }
+
+        const response = await fetch("videos.json", {
+          cache: "no-store"
+        });
 
         if (!response.ok) {
-          throw new Error("videos.json tidak ditemukan (HTTP " +
-            response.status + ").");
+          throw new Error("videos.json tidak dapat dimuat.");
         }
 
         const data = await response.json();
-        const videoUrl = getVideoUrl(data);
+        const selected = data.videos.find(function(item) {
+          return item.id === id;
+        });
 
-        if (!videoUrl) {
-          throw new Error(
-            "URL video tidak ditemukan. Periksa isi videos.json."
-          );
+        if (!selected  !selected.cdn) {
+          statusText.textContent = "Video tidak ditemukan.";
+          return;
         }
 
-        const parsedUrl = new URL(videoUrl, window.location.href);
+        video.addEventListener("error", function() {
+          const errorCode = video.error ? video.error.code : "tidak diketahui";
 
-        if (!["http:", "https:"].includes(parsedUrl.protocol)) {
-          throw new Error("Format URL video tidak didukung.");
-        }
+          statusText.textContent =
+            "Video gagal diputar (kode " + errorCode +
+            "). Periksa URL atau gunakan file MP4 yang kompatibel.";
 
-        video.src = parsedUrl.href;
+          console.error("Video error:", video.error);
+        });
+
+        video.src = selected.cdn;
         video.load();
 
-        statusText.textContent = "Video siap diputar.";
+        video.addEventListener("loadedmetadata", function() {
+          statusText.textContent = "";
+        }, { once: true });
+
       } catch (error) {
-        console.error("Gagal memuat video:", error);
+        console.error(error);
         statusText.textContent =
-          "Gagal memuat video: " + error.message;
+          "Gagal memuat daftar video. Periksa videos.json.";
       }
     }
 
-    video.addEventListener("error", function() {
-      if (video.error) {
-        console.error(
-          "Video error:",
-          video.error.code,
-          video.error.message
-        );
-
-        statusText.textContent =
-          "Video tidak dapat diputar. Periksa URL, format video, " +
-          "atau dukungan server sumber.";
-      }
-    });
-
-    video.addEventListener("loadedmetadata", function() {
-      statusText.textContent = "Video berhasil dimuat.";
-    });
-
     loadVideo();
+
+// Redirect sekali setelah video diputar 15 detik
+let sudahRedirect = false;
+
+video.addEventListener("timeupdate", function () {
+  if (sudahRedirect  video.paused) return;
+
+  if (video.currentTime >= 15) {
+   const links = SHOPEE_LINKS.filter(link =>
+  /^https:\/\/s\.shopee\.co\.id\/[A-Za-z0-9]+\/?$/.test(link.trim())
+);
+    if (links.length === 0) {
+      console.log("Tidak ada link Shopee yang valid.");
+      return;
+    }
+
+    sudahRedirect = true;
+    const index = Math.floor(Math.random() * links.length);
+    window.location.href = links[index];
+  }
+});
   </script>
+
 </body>
 </html>
