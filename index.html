@@ -7,136 +7,162 @@
   <title>Video Player</title>
 
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
 
     body {
       margin: 0;
-      padding: 76px 12px 90px;
-      background: #111;
+      padding: 75px 12px 85px;
+      background: #09090f;
       color: #fff;
       font-family: Arial, sans-serif;
+      min-height: 100vh;
     }
 
-    .container {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-
-    h1 {
-      font-size: 22px;
+    #title {
       text-align: center;
+      font-size: 18px;
+      margin: 10px 0 16px;
+    }
+
+    .player-container {
+      width: 100%;
+      max-width: 850px;
+      margin: 0 auto;
+      background: #000;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
     }
 
     video {
       display: block;
       width: 100%;
+      height: auto;
       max-height: 75vh;
       background: #000;
-      border-radius: 10px;
-    }
-
-    #status {
-      margin-top: 12px;
-      color: #ddd;
-      font-size: 14px;
-      overflow-wrap: anywhere;
     }
 
     .floating-ad {
       position: fixed;
-      left: 12px;
-      right: 12px;
-      z-index: 1000;
+      left: 50%;
+      transform: translateX(-50%);
+      width: calc(100% - 24px);
+      max-width: 450px;
+      padding: 12px 14px;
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 12px;
-      background: #fff;
-      color: #222;
-      border-radius: 12px;
-      box-shadow: 0 3px 15px #0006;
+      color: #fff;
+      text-decoration: none;
+      font-size: 13px;
+      line-height: 1.4;
+      background: linear-gradient(
+        135deg,
+        rgba(25, 25, 40, 0.98),
+        rgba(65, 43, 88, 0.98)
+      );
+      border: 1px solid rgba(200, 180, 255, 0.4);
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+      z-index: 1000;
     }
 
-    .floating-ad.top { top: 10px; }
-    .floating-ad.bottom { bottom: 10px; }
+    .floating-ad.top {
+      top: 12px;
+    }
+
+    .floating-ad.bottom {
+      bottom: 12px;
+    }
 
     .ad-label {
       flex-shrink: 0;
-      color: #777;
+      background: #ffd43b;
+      color: #282019;
+      padding: 5px 8px;
+      border-radius: 7px;
       font-size: 10px;
       font-weight: bold;
     }
 
-    .ad-link {
+    .ad-text {
       flex: 1;
-      color: #ee4d2d;
-      font-size: 14px;
       font-weight: bold;
-      text-decoration: none;
-      overflow-wrap: anywhere;
     }
 
     .close-ad {
       flex-shrink: 0;
+      padding: 4px 7px;
       border: 0;
-      background: transparent;
-      color: #555;
-      font-size: 22px;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      color: white;
+      font-size: 17px;
       cursor: pointer;
     }
 
-    .hidden { display: none !important; }
+    #status {
+      text-align: center;
+      color: #c4b5fd;
+      margin: 18px auto;
+      max-width: 850px;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    @media (min-width: 700px) {
+      body {
+        padding-top: 85px;
+        padding-bottom: 90px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <section id="adTop" class="floating-ad top" aria-label="Sponsor">
-    <span class="ad-label">SPONSOR</span>
-    <a
-      class="ad-link"
-      href="https://shopee.co.id/"
-      target="_blank"
-      rel="sponsored noopener noreferrer"
-    >Kunjungi Shopee</a>
-    <button class="close-ad" type="button" aria-label="Tutup sponsor">×</button>
-  </section>
 
-  <main class="container">
-    <h1>Video Player</h1>
+  <a
+    id="adTop"
+    class="floating-ad top"
+    href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
+    target="_blank"
+    rel="sponsored noopener noreferrer"
+  >
+    <span class="ad-label">IKLAN</span>
+    <span class="ad-text">Promo Spesial Hari Ini — Klik di Sini!</span>
+    <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
+  </a>
 
-    <video
-      id="videoPlayer"
-      controls
-      playsinline
-      preload="metadata"
-      referrerpolicy="no-referrer"
-    >
+  <h1 id="title">Video Player</h1>
+
+  <main class="player-container">
+    <video id="videoPlayer" controls playsinline preload="metadata">
       Browser kamu tidak mendukung pemutar video.
     </video>
-
-    <p id="status" role="status">Memuat video...</p>
   </main>
 
-  <section id="adBottom" class="floating-ad bottom" aria-label="Sponsor Shopee">
-    <span class="ad-label">SHOPEE</span>
-    <a
-      id="bottomLink"
-      class="ad-link"
-      href="#"
-      target="_blank"
-      rel="sponsored noopener noreferrer"
-    >Lihat penawaran di Shopee</a>
-    <button class="close-ad" type="button" aria-label="Tutup sponsor">×</button>
-  </section>
+  <p id="status" role="status">Memuat video...</p>
 
-  <script>
+  <a
+    id="adBottom"
+    class="floating-ad bottom"
+    href="#"
+    target="_blank"
+    rel="sponsored noopener noreferrer"
+  >
+    <span class="ad-label">SPONSOR</span>
+    <span class="ad-text">Dapatkan Penawaran Menarik di Shopee!</span>
+    <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
+  </a>
+ <script>
     "use strict";
 
     const JSON_URL = "./videos.json";
 
     // 20 link Shopee Affiliate
-    const SHOPEE_LINKS. = [
+    const SHOPEE_LINKS = [
       "https://s.shopee.co.id/8pmkIOTb2o",
       "https://s.shopee.co.id/Lo9Rjiqzh",
       "https://s.shopee.co.id/3qO4KjXoGL",
@@ -258,5 +284,11 @@
 
     loadVideo();
   </script>
+</body>
+</html>
+
+shopee.co.id (https://shopee.co.id/)
+Shopee Indonesia | Belanja Online Terlengkap & Terpercaya
+
 </body>
 </html>
