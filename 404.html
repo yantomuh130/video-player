@@ -207,9 +207,9 @@ if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
     });
 
     // Ambil ID video dari URL, misalnya #/video-tweet.
-    const id = decodeURIComponent(
-      window.location.hash.replace(/^#\/?/, "")
-    );
+   const id = decodeURIComponent(
+    window.location.pathname.replace(/^\/+/, "")
+);
 
     async function loadVideo() {
       try {
