@@ -45,6 +45,8 @@
     }
 
     .floating-ad {
+    display: none !important;
+}
       position: fixed;
       left: 50%;
       transform: translateX(-50%);
@@ -263,25 +265,37 @@ if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
 
     loadVideo();
 
-// Redirect sekali setelah video diputar 10 detik
-let sudahRedirect = false;
+// Tampilkan tombol iklan setelah video diputar 15 detik
+let iklanDitampilkan = false;
 
 video.addEventListener("timeupdate", function () {
-  if (sudahRedirect) return;
-  if (video.paused) return;
-  if (video.currentTime >= 10) {
-   const links = SHOPEE_LINKS.filter(link =>
-  /^https:\/\/s\.shopee\.co\.id\/[A-Za-z0-9]+\/?$/.test(link.trim())
-);
-    if (links.length === 0) {
-      console.log("Tidak ada link Shopee yang valid.");
-      return;
-    }
+    if (iklanDitampilkan) return;
 
-    sudahRedirect = true;
-    const index = Math.floor(Math.random() * links.length);
-    window.location.href = links[index];
-  }
+    if (video.currentTime >= 15) {
+        iklanDitampilkan = true;
+
+        const tombol = document.createElement("a");
+        tombol.href = "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
+        tombol.target = "_blank";
+        tombol.rel = "noopener noreferrer";
+        tombol.textContent = "Kunjungi Sponsor";
+
+        tombol.style.cssText = 
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ff4fa3;
+            color: white;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-weight: bold;
+            text-decoration: none;
+            z-index: 9999;
+        ;
+
+        document.body.appendChild(tombol);
+    }
 });
   </script>
 
