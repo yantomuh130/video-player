@@ -53,8 +53,6 @@
       overflow-wrap: anywhere;
     }
 
-    /* LINK TELEGRAM */
-
     .telegram-link {
       display: block;
       text-align: center;
@@ -72,7 +70,6 @@
     .telegram-link:hover {
       color: #8daee5;
     }
-
   </style>
 </head>
 
@@ -87,8 +84,6 @@
   </main>
 
   <p id="status" role="status">Memuat video...</p>
-
-  <!-- LINK TELEGRAM -->
 
   <a
     href="https://t.me/wuikwuik"
@@ -119,21 +114,14 @@
 
 
     // ==================================
-    // PRIORITAS KLIK TELEGRAM
+    // STATUS REDIRECT
+    // HANYA 1 KALI PER SESI TAB
     // ==================================
 
-    let membukaTelegram = false;
+    const STORAGE_KEY = "adsterra_redirect_sudah_tampil";
 
-    telegramLink.addEventListener("pointerdown", function () {
-      membukaTelegram = true;
-      video.pause();
-    }, true);
-
-    telegramLink.addEventListener("click", function (event) {
-      membukaTelegram = true;
-      event.stopImmediatePropagation();
-      event.stopPropagation();
-    }, true);
+    let iklanDitampilkan =
+      sessionStorage.getItem(STORAGE_KEY) === "1";
 
 
     // ==================================
@@ -146,21 +134,21 @@
 
 
     // ==================================
-    // REDIRECT ADSTERRA 15 DETIK
+    // REDIRECT ADSTERRA SETELAH 15 DETIK
     // ==================================
-
-    let iklanDitampilkan = false;
 
     video.addEventListener("timeupdate", function () {
 
-      if (iklanDitampilkan || membukaTelegram) return;
+      if (iklanDitampilkan) return;
 
       if (video.currentTime >= 15) {
+
+        // Simpan status sebelum redirect
+        sessionStorage.setItem(STORAGE_KEY, "1");
 
         iklanDitampilkan = true;
 
         window.location.href = ADSTERRA_LINK;
-
       }
 
     });
@@ -220,9 +208,7 @@
         video.load();
 
         video.addEventListener("loadedmetadata", function () {
-
           statusText.textContent = "";
-
         }, { once: true });
 
       } catch (error) {
