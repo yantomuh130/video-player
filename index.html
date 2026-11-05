@@ -85,8 +85,10 @@
   <p id="status" role="status">Memuat video...</p>
 
   <!-- LINK TELEGRAM -->
+
   <a
     href="https://t.me/wuikwuik"
+    id="telegramLink"
     class="telegram-link"
     target="_blank"
     rel="noopener noreferrer">
@@ -109,6 +111,18 @@
 
     const video = document.getElementById("videoPlayer");
     const statusText = document.getElementById("status");
+    const telegramLink = document.getElementById("telegramLink");
+
+
+    // ==================================
+    // STATUS KLIK TELEGRAM
+    // ==================================
+
+    let membukaTelegram = false;
+
+    telegramLink.addEventListener("click", function () {
+      membukaTelegram = true;
+    });
 
 
     // ==================================
@@ -128,13 +142,12 @@
 
     video.addEventListener("timeupdate", function () {
 
-      if (iklanDitampilkan) return;
+      if (iklanDitampilkan || membukaTelegram) return;
 
       if (video.currentTime >= 15) {
 
         iklanDitampilkan = true;
 
-        // Redirect pada tab yang sama
         window.location.href = ADSTERRA_LINK;
 
       }
