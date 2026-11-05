@@ -68,39 +68,62 @@
   <p id="status" role="status">Memuat video...</p>
 
   <script>
-    // URL Adsterra
+
+    // ==================================
+    // LINK ADSTERRA
+    // ==================================
+
     const ADSTERRA_LINK =
       "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
+
+
+    // ==================================
+    // ELEMENT VIDEO
+    // ==================================
 
     const video = document.getElementById("videoPlayer");
     const statusText = document.getElementById("status");
 
-    // Ambil ID video dari URL
+
+    // ==================================
+    // ID VIDEO DARI URL
+    // ==================================
+
     const id = decodeURIComponent(
       window.location.pathname.replace(/^\/+/, "")
     );
 
-    // Mencegah redirect berulang
+
+    // ==================================
+    // REDIRECT ADSTERRA 15 DETIK
+    // ==================================
+
     let iklanDitampilkan = false;
 
-    // Redirect setelah video diputar 15 detik
     video.addEventListener("timeupdate", function () {
+
       if (iklanDitampilkan) return;
 
       if (video.currentTime >= 15) {
+
         iklanDitampilkan = true;
 
-        window.open(
-          ADSTERRA_LINK,
-          "_blank",
-          "noopener,noreferrer"
-        );
+        // Redirect pada tab yang sama
+        window.location.href = ADSTERRA_LINK;
+
       }
+
     });
 
-    // Memuat video dari videos.json
+
+    // ==================================
+    // MEMUAT VIDEO DARI VIDEOS.JSON
+    // ==================================
+
     async function loadVideo() {
+
       try {
+
         if (!id) {
           statusText.textContent =
             "Tambahkan ID video di akhir URL.";
@@ -117,6 +140,10 @@
 
         const data = await response.json();
 
+        if (!Array.isArray(data.videos)) {
+          throw new Error("Format videos.json tidak valid.");
+        }
+
         const selected = data.videos.find(function (item) {
           return item.id === id;
         });
@@ -127,6 +154,7 @@
         }
 
         video.addEventListener("error", function () {
+
           const errorCode = video.error
             ? video.error.code
             : "tidak diketahui";
@@ -135,24 +163,36 @@
             "Video gagal diputar (kode " + errorCode + ").";
 
           console.error("Video error:", video.error);
+
         });
 
         video.src = selected.cdn;
         video.load();
 
         video.addEventListener("loadedmetadata", function () {
+
           statusText.textContent = "";
+
         }, { once: true });
 
       } catch (error) {
+
         console.error(error);
 
         statusText.textContent =
           "Gagal memuat daftar video. Periksa videos.json.";
+
       }
+
     }
 
+
+    // ==================================
+    // JALANKAN VIDEO PLAYER
+    // ==================================
+
     loadVideo();
+
   </script>
 
 </body>
