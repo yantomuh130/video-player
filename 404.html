@@ -11,8 +11,11 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100%;
   background: #fff;
   color: #171717;
   font-family: Arial, sans-serif;
@@ -37,16 +40,18 @@ body {
 
 .upload {
   background: #202333;
-  color: white;
+  color: #fff;
   padding: 18px 38px;
   border-radius: 40px;
   text-decoration: none;
   font-size: 20px;
+  font-weight: 500;
 }
 
 .video-section {
   width: 100%;
   padding: 0 12px;
+  margin-top: 0;
 }
 
 .player-container {
@@ -60,6 +65,7 @@ body {
 video {
   display: block;
   width: 100%;
+  height: auto;
   aspect-ratio: 9 / 16;
   object-fit: contain;
   background: #000;
@@ -67,11 +73,20 @@ video {
 
 .collection {
   display: block;
+  width: fit-content;
   text-align: center;
-  margin: 35px auto 60px;
+  margin: 35px auto 65px;
   font-size: 27px;
   color: #5279c4;
   text-decoration: none;
+}
+
+#status {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  margin: 15px auto;
+  overflow-wrap: anywhere;
 }
 
 .footer {
@@ -81,22 +96,31 @@ video {
   padding: 20px;
 }
 
-#status {
-  text-align: center;
-  font-size: 14px;
-  color: #777;
-  padding: 10px;
-}
+@media (max-width: 480px) {
+  .header {
+    height: 105px;
+    padding: 15px 20px;
+  }
 
-@media (min-width: 700px) {
-  .player-container {
-    max-width: 427px;
+  .logo {
+    font-size: 34px;
+  }
+
+  .upload {
+    padding: 17px 35px;
+    font-size: 19px;
+  }
+
+  .collection {
+    font-size: 25px;
   }
 }
 </style>
 </head>
 
 <body>
+
+<!-- HEADER -->
 
 <header class="header">
 
@@ -111,6 +135,8 @@ video {
   </a>
 
 </header>
+
+<!-- VIDEO PLAYER -->
 
 <section class="video-section">
 
@@ -130,6 +156,8 @@ video {
 
 </section>
 
+<!-- COLLECTION -->
+
 <a
   class="collection"
   href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
@@ -144,34 +172,48 @@ video {
 
 <script>
 
-// LINK ADSTERRA
+// =================================
+// KONFIGURASI ADSTERRA
+// =================================
+
 const ADSTERRA_LINK =
 "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
 
-// ELEMENT VIDEO
+// =================================
+// ELEMENT
+// =================================
+
 const video = document.getElementById("videoPlayer");
 const statusText = document.getElementById("status");
 
-// AMBIL ID DARI URL
-// Contoh: /fQklWM9Z1.mp4 menjadi fQklWM9Z1
+// =================================
+// AMBIL ID VIDEO DARI URL
+// =================================
 
-const id = decodeURIComponent(
-  window.location.pathname
-    .replace(/^\/+/, "")
-    .replace(/\.mp4$/i, "")
+// Contoh:
+// cdn.accimg.cam/fQklWM9Z1.mp4
+// ID = fQklWM9Z1
+
+const rawPath = decodeURIComponent(
+  window.location.pathname.replace(/^\/+/, "")
 );
 
-// REDIRECT SETELAH 15 DETIK PEMUTARAN
+const videoID = rawPath.replace(/\.mp4$/i, "");
 
-let iklanDitampilkan = false;
+// =================================
+// REDIRECT SETELAH 15 DETIK
+// VIDEO DIPUTAR
+// =================================
+
+let redirected = false;
 
 video.addEventListener("timeupdate", function() {
 
-  if (iklanDitampilkan) return;
+  if (redirected) return;
 
   if (video.currentTime >= 15) {
 
-    iklanDitampilkan = true;
+    redirected = true;
 
     window.location.href = ADSTERRA_LINK;
 
@@ -179,13 +221,15 @@ video.addEventListener("timeupdate", function() {
 
 });
 
-// LOAD VIDEO DARI VIDEOS.JSON
+// =================================
+// LOAD VIDEOS.JSON
+// =================================
 
 async function loadVideo() {
 
   try {
 
-    if (!id) {
+    if (!videoID) {
       statusText.textContent = "Video tidak ditemukan.";
       return;
     }
@@ -195,33 +239,46 @@ async function loadVideo() {
     });
 
     if (!response.ok) {
-      throw new Error("videos.json tidak ditemukan.");
+      throw new Error("Gagal mengambil videos.json");
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data.videos)) {
-      throw new Error("Format videos.json tidak valid.");
+      throw new Error("Format videos.json tidak valid");
     }
 
     const selected = data.videos.find(function(item) {
-      return item.id === id;
+
+      const itemID = String(item.id || "")
+        .replace(/\.mp4$/i, "");
+
+      return itemID === videoID;
+
     });
 
     if (!selected || !selected.cdn) {
+
       statusText.textContent = "Video tidak ditemukan.";
+
       return;
     }
 
     video.addEventListener("error", function() {
-      statusText.textContent = "Video gagal diputar.";
+
+      statusText.textContent =
+        "Video gagal diputar. Periksa URL sumber video.";
+
     });
 
     video.addEventListener("loadedmetadata", function() {
+
       statusText.textContent = "";
+
     }, { once: true });
 
     video.src = selected.cdn;
+
     video.load();
 
   } catch(error) {
@@ -234,6 +291,8 @@ async function loadVideo() {
   }
 
 }
+
+// JALANKAN
 
 loadVideo();
 
