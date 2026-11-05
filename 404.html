@@ -52,24 +52,6 @@
       font-size: 14px;
       overflow-wrap: anywhere;
     }
-
-    .telegram-link {
-      display: block;
-      text-align: center;
-      color: #6686b8;
-      font-size: 28px;
-      text-decoration: none;
-      margin: 35px auto 20px;
-      font-weight: 400;
-      position: relative;
-      z-index: 9999;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .telegram-link:hover {
-      color: #8daee5;
-    }
   </style>
 </head>
 
@@ -84,14 +66,6 @@
   </main>
 
   <p id="status" role="status">Memuat video...</p>
-
-  <a
-    href="https://t.me/wuikwuik"
-    class="telegram-link"
-    target="_blank"
-    rel="noopener noreferrer">
-    Cek koleksi lainnya
-  </a>
 
   <script>
 
@@ -112,32 +86,19 @@
 
 
     // ==================================
-    // ID VIDEO DARI PARAMETER ?f=
+    // ID VIDEO DARI URL
     // ==================================
 
-    const params = new URLSearchParams(window.location.search);
-    const id = params.get("f");
+    const id = decodeURIComponent(
+      window.location.pathname.replace(/^\/+/, "")
+    );
 
 
     // ==================================
-    // STATUS REDIRECT SEKALI PER BROWSER
+    // REDIRECT ADSTERRA 15 DETIK
     // ==================================
-
-    const STORAGE_KEY = "adsterra_redirect_sudah_tampil";
 
     let iklanDitampilkan = false;
-
-    try {
-      iklanDitampilkan =
-        localStorage.getItem(STORAGE_KEY) === "1";
-    } catch (error) {
-      console.warn("LocalStorage tidak tersedia:", error);
-    }
-
-
-    // ==================================
-    // REDIRECT ADSTERRA SETELAH 15 DETIK
-    // ==================================
 
     video.addEventListener("timeupdate", function () {
 
@@ -147,13 +108,9 @@
 
         iklanDitampilkan = true;
 
-        try {
-          localStorage.setItem(STORAGE_KEY, "1");
-        } catch (error) {
-          console.warn("Gagal menyimpan status iklan:", error);
-        }
-
+        // Redirect pada tab yang sama
         window.location.href = ADSTERRA_LINK;
+
       }
 
     });
@@ -169,11 +126,11 @@
 
         if (!id) {
           statusText.textContent =
-            "Parameter video tidak ditemukan.";
+            "Tambahkan ID video di akhir URL.";
           return;
         }
 
-        const response = await fetch("/videos.json", {
+        const response = await fetch("videos.json", {
           cache: "no-store"
         });
 
@@ -187,10 +144,8 @@
           throw new Error("Format videos.json tidak valid.");
         }
 
-        // Cocokkan nama file dari parameter f
         const selected = data.videos.find(function (item) {
-          return item.id === id ||
-                 item.id === id.replace(/\.mp4$/i, "");
+          return item.id === id;
         });
 
         if (!selected || !selected.cdn) {
@@ -215,7 +170,9 @@
         video.load();
 
         video.addEventListener("loadedmetadata", function () {
+
           statusText.textContent = "";
+
         }, { once: true });
 
       } catch (error) {
