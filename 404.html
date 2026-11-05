@@ -7,9 +7,7 @@
 <title>accimg</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -102,28 +100,21 @@ video {
     padding: 15px 20px;
   }
 
-  .logo {
-    font-size: 34px;
-  }
+  .logo { font-size: 34px; }
 
   .upload {
     padding: 17px 35px;
     font-size: 19px;
   }
 
-  .collection {
-    font-size: 25px;
-  }
+  .collection { font-size: 25px; }
 }
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-
 <header class="header">
-
   <a class="logo" href="/">accimg</a>
 
   <a
@@ -133,15 +124,10 @@ video {
     rel="sponsored noopener noreferrer">
     Upload
   </a>
-
 </header>
 
-<!-- VIDEO PLAYER -->
-
 <section class="video-section">
-
   <main class="player-container">
-
     <video
       id="videoPlayer"
       controls
@@ -149,14 +135,10 @@ video {
       preload="metadata">
       Browser tidak mendukung pemutar video.
     </video>
-
   </main>
 
   <p id="status">Memuat video...</p>
-
 </section>
-
-<!-- COLLECTION -->
 
 <a
   class="collection"
@@ -166,71 +148,37 @@ video {
   Cek koleksi lainnya
 </a>
 
-<footer class="footer">
-  Accimg
-</footer>
+<footer class="footer">Accimg</footer>
 
 <script>
-
-// =================================
-// KONFIGURASI ADSTERRA
-// =================================
-
 const ADSTERRA_LINK =
-"https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
-
-// =================================
-// ELEMENT
-// =================================
+  "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
 
 const video = document.getElementById("videoPlayer");
 const statusText = document.getElementById("status");
 
-// =================================
-// AMBIL ID VIDEO DARI URL
-// =================================
+// Format URL: /upload/?f=8968ce9b.mp4
+// Ambil nilai "f" dari query string.
+const filename = new URLSearchParams(window.location.search).get("f");
 
-// Contoh:
-// cdn.accimg.cam/fQklWM9Z1.mp4
-// ID = fQklWM9Z1
-
-const rawPath = decodeURIComponent(
-  window.location.pathname.replace(/^\/+/, "")
-);
-
-const videoID = rawPath.replace(/\.mp4$/i, "");
-
-// =================================
-// REDIRECT SETELAH 15 DETIK
-// VIDEO DIPUTAR
-// =================================
+// ID di videos.json disimpan sebagai:
+// upload/?f=8968ce9b.mp4
+const expectedID = filename ? "upload/?f=" + filename : "";
 
 let redirected = false;
 
-video.addEventListener("timeupdate", function() {
-
-  if (redirected) return;
-
-  if (video.currentTime >= 15) {
-
+// Redirect setelah video benar-benar diputar selama 15 detik.
+video.addEventListener("timeupdate", function () {
+  if (!redirected && video.currentTime >= 15) {
     redirected = true;
-
     window.location.href = ADSTERRA_LINK;
-
   }
-
 });
 
-// =================================
-// LOAD VIDEOS.JSON
-// =================================
-
 async function loadVideo() {
-
   try {
-
-    if (!videoID) {
-      statusText.textContent = "Video tidak ditemukan.";
+    if (!filename || !/^[a-zA-Z0-9]{8}\.mp4$/i.test(filename)) {
+      statusText.textContent = "Format atau ID video tidak valid.";
       return;
     }
 
@@ -239,63 +187,44 @@ async function loadVideo() {
     });
 
     if (!response.ok) {
-      throw new Error("Gagal mengambil videos.json");
+      throw new Error("Gagal mengambil videos.json: HTTP " + response.status);
     }
 
     const data = await response.json();
 
     if (!Array.isArray(data.videos)) {
-      throw new Error("Format videos.json tidak valid");
+      throw new Error("Format videos.json tidak valid.");
     }
 
-    const selected = data.videos.find(function(item) {
-
-      const itemID = String(item.id || "")
-        .replace(/\.mp4$/i, "");
-
-      return itemID === videoID;
-
+    const selected = data.videos.find(function (item) {
+      return String(item.id || "") === expectedID;
     });
 
     if (!selected || !selected.cdn) {
-
       statusText.textContent = "Video tidak ditemukan.";
-
       return;
     }
 
-    video.addEventListener("error", function() {
-
+    video.addEventListener("error", function () {
       statusText.textContent =
         "Video gagal diputar. Periksa URL sumber video.";
-
     });
 
-    video.addEventListener("loadedmetadata", function() {
-
+    video.addEventListener("loadedmetadata", function () {
       statusText.textContent = "";
-
     }, { once: true });
 
     video.src = selected.cdn;
-
     video.load();
 
-  } catch(error) {
-
+  } catch (error) {
     console.error(error);
-
     statusText.textContent =
       "Gagal memuat video. Periksa videos.json.";
-
   }
-
 }
 
-// JALANKAN
-
 loadVideo();
-
 </script>
 
 </body>
