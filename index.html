@@ -110,18 +110,23 @@
 
     const video = document.getElementById("videoPlayer");
     const statusText = document.getElementById("status");
-    const telegramLink = document.getElementById("telegramLink");
 
 
     // ==================================
     // STATUS REDIRECT
-    // HANYA 1 KALI PER SESI TAB
+    // HANYA 1 KALI PER BROWSER
     // ==================================
 
     const STORAGE_KEY = "adsterra_redirect_sudah_tampil";
 
-    let iklanDitampilkan =
-      sessionStorage.getItem(STORAGE_KEY) === "1";
+    let iklanDitampilkan = false;
+
+    try {
+      iklanDitampilkan =
+        localStorage.getItem(STORAGE_KEY) === "1";
+    } catch (error) {
+      console.warn("LocalStorage tidak tersedia:", error);
+    }
 
 
     // ==================================
@@ -135,6 +140,7 @@
 
     // ==================================
     // REDIRECT ADSTERRA SETELAH 15 DETIK
+    // HANYA SEKALI
     // ==================================
 
     video.addEventListener("timeupdate", function () {
@@ -143,12 +149,18 @@
 
       if (video.currentTime >= 15) {
 
-        // Simpan status sebelum redirect
-        sessionStorage.setItem(STORAGE_KEY, "1");
-
+        // Tandai iklan sudah ditampilkan
         iklanDitampilkan = true;
 
+        try {
+          localStorage.setItem(STORAGE_KEY, "1");
+        } catch (error) {
+          console.warn("Gagal menyimpan status iklan:", error);
+        }
+
+        // Redirect ke Adsterra
         window.location.href = ADSTERRA_LINK;
+
       }
 
     });
