@@ -1,247 +1,129 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="referrer" content="no-referrer">
-  <title>Video Player</title>
+<a
+  href="https://t.me/wuikwuik"
+  id="telegramLink"
+  class="telegram-link"
+  target="_blank"
+  rel="noopener noreferrer">
+  Cek koleksi lainnya
+</a>
 
-  <style>
-    * {
-      box-sizing: border-box;
+<script>
+  // ==================================
+  // KONFIGURASI
+  // ==================================
+  const ADSTERRA_LINK = "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
+  const TELEGRAM_LINK = "https://t.me/wuikwuik";
+  const IKLAN_DETIK = 15;
+  const STORAGE_KEY = "adsterra_redirect_sudah_tampil";
+
+  const video = document.getElementById("videoPlayer");
+  const statusText = document.getElementById("status");
+  const telegramLink = document.getElementById("telegramLink");
+
+  telegramLink.href = TELEGRAM_LINK;
+
+  // ==================================
+  // HELPER STORAGE
+  // ==================================
+  function simpan(key, value) {
+    try { localStorage.setItem(key, value); } catch (e) {}
+  }
+
+  function ambil(key) {
+    try { return localStorage.getItem(key); } catch (e) { return null; }
+  }
+
+  // ==================================
+  // ID VIDEO DARI URL
+  // ==================================
+  const id = decodeURIComponent(window.location.pathname.replace(/^\/+/, ""));
+  const POSITION_KEY = "posisi_video_" + id;
+
+  let iklanDitampilkan = ambil(STORAGE_KEY) === "1";
+
+  // ==================================
+  // REDIRECT ADSTERRA (SEKALI SAJA)
+  // ==================================
+  video.addEventListener("timeupdate", function () {
+    if (iklanDitampilkan) return;
+    if (video.seeking) return;
+
+    if (video.currentTime >= IKLAN_DETIK) {
+      iklanDitampilkan = true;
+      simpan(STORAGE_KEY, "1");
+
+      // Simpan posisi agar video lanjut saat pengunjung kembali
+      simpan(POSITION_KEY, String(video.currentTime));
+
+      video.pause();
+      window.location.href = ADSTERRA_LINK;
     }
+  });
 
-    body {
-      margin: 0;
-      padding: 20px 12px;
-      background: #09090f;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      min-height: 100vh;
+  // ==================================
+  // LANJUTKAN POSISI SETELAH KEMBALI
+  // ==================================
+  function lanjutkanPosisi() {
+    const tersimpan = parseFloat(ambil(POSITION_KEY));
+    if (!isNaN(tersimpan) && tersimpan > 0) {
+      video.currentTime = tersimpan;
+      try { localStorage.removeItem(POSITION_KEY); } catch (e) {}
     }
+  }
 
-    #title {
-      text-align: center;
-      font-size: 18px;
-      margin: 10px 0 16px;
+  // Halaman dipulihkan dari cache (tombol Back)
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted && video.readyState >= 1) {
+      lanjutkanPosisi();
     }
+  });
 
-    .player-container {
-      width: 100%;
-      max-width: 850px;
-      margin: 0 auto;
-      background: #000;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-    }
-
-    video {
-      display: block;
-      width: 100%;
-      height: auto;
-      max-height: 75vh;
-      background: #000;
-    }
-
-    #status {
-      text-align: center;
-      color: #c4b5fd;
-      margin: 18px auto;
-      max-width: 850px;
-      font-size: 14px;
-      overflow-wrap: anywhere;
-    }
-
-    .telegram-link {
-      display: block;
-      text-align: center;
-      color: #6686b8;
-      font-size: 28px;
-      text-decoration: none;
-      margin: 35px auto 20px;
-      font-weight: 400;
-      position: relative;
-      z-index: 9999;
-      cursor: pointer;
-      -webkit-tap-highlight-color: transparent;
-    }
-
-    .telegram-link:hover {
-      color: #8daee5;
-    }
-  </style>
-</head>
-
-<body>
-
-  <h1 id="title">Video Player</h1>
-
-  <main class="player-container">
-    <video id="videoPlayer" controls playsinline preload="metadata">
-      Browser kamu tidak mendukung pemutar video.
-    </video>
-  </main>
-
-  <p id="status" role="status">Memuat video...</p>
-
-  <a
-    href="https://t.me/wuikwuik"
-    id="telegramLink"
-    class="telegram-link"
-    target="_blank"
-    rel="noopener noreferrer">
-    Cek koleksi lainnya
-  </a>
-
-  <script>
-
-    // ==================================
-    // LINK ADSTERRA
-    // ==================================
-
-    const ADSTERRA_LINK =
-      "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
-
-
-    // ==================================
-    // ELEMENT VIDEO
-    // ==================================
-
-    const video = document.getElementById("videoPlayer");
-    const statusText = document.getElementById("status");
-
-
-    // ==================================
-    // STATUS REDIRECT
-    // HANYA 1 KALI PER BROWSER
-    // ==================================
-
-    const STORAGE_KEY = "adsterra_redirect_sudah_tampil";
-
-    let iklanDitampilkan = false;
-
+  // ==================================
+  // MEMUAT VIDEO DARI VIDEOS.JSON
+  // ==================================
+  async function loadVideo() {
     try {
-      iklanDitampilkan =
-        localStorage.getItem(STORAGE_KEY) === "1";
+      if (!id) {
+        statusText.textContent = "Tambahkan ID video di akhir URL.";
+        return;
+      }
+
+      const response = await fetch("videos.json", { cache: "no-store" });
+      if (!response.ok) throw new Error("videos.json tidak dapat dimuat.");
+
+      const data = await response.json();
+      if (!Array.isArray(data.videos)) {
+        throw new Error("Format videos.json tidak valid.");
+      }
+
+      const selected = data.videos.find(function (item) {
+        return item.id === id;
+      });
+
+      if (!selected || !selected.cdn) {
+        statusText.textContent = "Video tidak ditemukan.";
+        return;
+      }
+
+      video.addEventListener("error", function () {
+        const code = video.error ? video.error.code : "tidak diketahui";
+        statusText.textContent = "Video gagal diputar (kode " + code + ").";
+        console.error("Video error:", video.error);
+      });
+
+      video.addEventListener("loadedmetadata", function () {
+        statusText.textContent = "";
+        lanjutkanPosisi();
+      }, { once: true });
+
+      video.src = selected.cdn;
+      video.load();
+
     } catch (error) {
-      console.warn("LocalStorage tidak tersedia:", error);
+      console.error(error);
+      statusText.textContent = "Gagal memuat daftar video. Periksa videos.json.";
     }
+  }
 
-
-    // ==================================
-    // ID VIDEO DARI URL
-    // ==================================
-
-    const id = decodeURIComponent(
-      window.location.pathname.replace(/^\/+/, "")
-    );
-
-
-    // ==================================
-    // REDIRECT ADSTERRA SETELAH 15 DETIK
-    // HANYA SEKALI
-    // ==================================
-
-    video.addEventListener("timeupdate", function () {
-
-      if (iklanDitampilkan) return;
-
-      if (video.currentTime >= 15) {
-
-        // Tandai iklan sudah ditampilkan
-        iklanDitampilkan = true;
-
-        try {
-          localStorage.setItem(STORAGE_KEY, "1");
-        } catch (error) {
-          console.warn("Gagal menyimpan status iklan:", error);
-        }
-
-        // Redirect ke Adsterra
-        window.location.href = ADSTERRA_LINK;
-
-      }
-
-    });
-
-
-    // ==================================
-    // MEMUAT VIDEO DARI VIDEOS.JSON
-    // ==================================
-
-    async function loadVideo() {
-
-      try {
-
-        if (!id) {
-          statusText.textContent =
-            "Tambahkan ID video di akhir URL.";
-          return;
-        }
-
-        const response = await fetch("videos.json", {
-          cache: "no-store"
-        });
-
-        if (!response.ok) {
-          throw new Error("videos.json tidak dapat dimuat.");
-        }
-
-        const data = await response.json();
-
-        if (!Array.isArray(data.videos)) {
-          throw new Error("Format videos.json tidak valid.");
-        }
-
-        const selected = data.videos.find(function (item) {
-          return item.id === id;
-        });
-
-        if (!selected || !selected.cdn) {
-          statusText.textContent = "Video tidak ditemukan.";
-          return;
-        }
-
-        video.addEventListener("error", function () {
-
-          const errorCode = video.error
-            ? video.error.code
-            : "tidak diketahui";
-
-          statusText.textContent =
-            "Video gagal diputar (kode " + errorCode + ").";
-
-          console.error("Video error:", video.error);
-
-        });
-
-        video.src = selected.cdn;
-        video.load();
-
-        video.addEventListener("loadedmetadata", function () {
-          statusText.textContent = "";
-        }, { once: true });
-
-      } catch (error) {
-
-        console.error(error);
-
-        statusText.textContent =
-          "Gagal memuat daftar video. Periksa videos.json.";
-
-      }
-
-    }
-
-
-    // ==================================
-    // JALANKAN VIDEO PLAYER
-    // ==================================
-
-    loadVideo();
-
-  </script>
-
-</body>
-</html>
+  loadVideo();
+</script>
