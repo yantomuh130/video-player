@@ -13,7 +13,7 @@
 
     body {
       margin: 0;
-      padding: 75px 12px 85px;
+      padding: 20px 12px;
       background: #09090f;
       color: #fff;
       font-family: Arial, sans-serif;
@@ -44,67 +44,6 @@
       background: #000;
     }
 
-    .floating-ad {
-    display: none !important;
-}
-      position: fixed;
-      left: 50%;
-      transform: translateX(-50%);
-      width: calc(100% - 24px);
-      max-width: 450px;
-      padding: 12px 14px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #fff;
-      text-decoration: none;
-      font-size: 13px;
-      line-height: 1.4;
-      background: linear-gradient(
-        135deg,
-        rgba(25, 25, 40, 0.98),
-        rgba(65, 43, 88, 0.98)
-      );
-      border: 1px solid rgba(200, 180, 255, 0.4);
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-      z-index: 1000;
-    }
-
-    .floating-ad.top {
-      top: 12px;
-    }
-
-    .floating-ad.bottom {
-      bottom: 12px;
-    }
-
-    .ad-label {
-      flex-shrink: 0;
-      background: #ffd43b;
-      color: #282019;
-      padding: 5px 8px;
-      border-radius: 7px;
-      font-size: 10px;
-      font-weight: bold;
-    }
-
-    .ad-text {
-      flex: 1;
-      font-weight: bold;
-    }
-
-    .close-ad {
-      flex-shrink: 0;
-      padding: 4px 7px;
-      border: 0;
-      border-radius: 6px;
-      background: rgba(255, 255, 255, 0.12);
-      color: white;
-      font-size: 17px;
-      cursor: pointer;
-    }
-
     #status {
       text-align: center;
       color: #c4b5fd;
@@ -113,29 +52,10 @@
       font-size: 14px;
       overflow-wrap: anywhere;
     }
-
-    @media (min-width: 700px) {
-      body {
-        padding-top: 85px;
-        padding-bottom: 90px;
-      }
-    }
   </style>
 </head>
 
 <body>
-
-  <a
-    id="adTop"
-    class="floating-ad top"
-    href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
-    target="_blank"
-    rel="sponsored noopener noreferrer"
-  >
-    <span class="ad-label">IKLAN</span>
-    <span class="ad-text">1 klik mu membantu admin semangat untuk update</span>
-    <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
-  </a>
 
   <h1 id="title">Video Player</h1>
 
@@ -147,77 +67,43 @@
 
   <p id="status" role="status">Memuat video...</p>
 
-  <a
-    id="adBottom"
-    class="floating-ad bottom"
-    href="#"
-    target="_blank"
-    rel="sponsored noopener noreferrer"
-  >
-    <span class="ad-label">SPONSOR</span>
-    <span class="ad-text">klik disini juga bikin admin semangat</span>
-    <button class="close-ad" type="button" aria-label="Tutup iklan">×</button>
-  </a>
-<script>
- const SHOPEE_LINKS = [
-  "https://s.shopee.co.id/8pmkIOTb2o",
-  "https://s.shopee.co.id/Lo9Rjiqzh",
-  "https://s.shopee.co.id/3qO4KjXoGL",
-  "https://s.shopee.co.id/7famtrLnpd",
-  "https://s.shopee.co.id/9pfHTs0EcX",
-  "https://s.shopee.co.id/6L5PJSMIYJ",
-  "https://s.shopee.co.id/8AX3UqEumv",
-  "https://s.shopee.co.id/6L5PJU22Fg",
-  "https://s.shopee.co.id/3B8NXg2LNQ",
-  "https://s.shopee.co.id/AKbY4runby",
-  "https://s.shopee.co.id/8AX3Uthbkb",
-  "https://s.shopee.co.id/W7cMop0gh",
-  "https://s.shopee.co.id/113sy3V81U",
-  "https://s.shopee.co.id/7VHMi1AW5K",
-  "https://s.shopee.co.id/8KqThYp4CF",
-  "https://s.shopee.co.id/5fpiWfqUod",
-  "https://s.shopee.co.id/9fLrI2IRNj",
-  "https://s.shopee.co.id/9pfHUMI9s9",
-  "https://s.shopee.co.id/4B0ujzOyZd",
-  "https://s.shopee.co.id/qkSly8N4N",
-];
-    // Ganti dengan URL Shopee Affiliate milikmu.
-  
+  <script>
+    // URL Adsterra
+    const ADSTERRA_LINK =
+      "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
 
     const video = document.getElementById("videoPlayer");
     const statusText = document.getElementById("status");
 
-    // Atur link Shopee jika sudah tersedia.
-    const bottomAd = document.getElementById("adBottom");
+    // Ambil ID video dari URL
+    const id = decodeURIComponent(
+      window.location.pathname.replace(/^\/+/, "")
+    );
 
-// Pilih link Shopee secara acak untuk banner bawah
-if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
-    const randomIndex = Math.floor(Math.random() * SHOPEE_LINKS.length);
-    bottomAd.href = SHOPEE_LINKS[randomIndex];
-    bottomAd.target = "_blank";
-} else {
-    bottomAd.href = "#";
-}
-    
-    // Tombol tutup banner.
-    document.querySelectorAll(".close-ad").forEach(function(button) {
-      button.addEventListener("click", function(event) {
-        event.preventDefault();
-        event.stopPropagation();
-        button.closest(".floating-ad").style.display = "none";
-      });
+    // Mencegah redirect berulang
+    let iklanDitampilkan = false;
+
+    // Redirect setelah video diputar 15 detik
+    video.addEventListener("timeupdate", function () {
+      if (iklanDitampilkan) return;
+
+      if (video.currentTime >= 15) {
+        iklanDitampilkan = true;
+
+        window.open(
+          ADSTERRA_LINK,
+          "_blank",
+          "noopener,noreferrer"
+        );
+      }
     });
 
-    // Ambil ID video dari URL, misalnya #/video-tweet.
-   const id = decodeURIComponent(
-    window.location.pathname.replace(/^\/+/, "")
-);
-
+    // Memuat video dari videos.json
     async function loadVideo() {
       try {
         if (!id) {
           statusText.textContent =
-            "Tambahkan ID video di akhir URL, misalnya #/video-tweet.";
+            "Tambahkan ID video di akhir URL.";
           return;
         }
 
@@ -230,21 +116,23 @@ if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
         }
 
         const data = await response.json();
-        const selected = data.videos.find(function(item) {
+
+        const selected = data.videos.find(function (item) {
           return item.id === id;
         });
 
-        if (!selected && !selected.cdn) {
+        if (!selected || !selected.cdn) {
           statusText.textContent = "Video tidak ditemukan.";
           return;
         }
 
-        video.addEventListener("error", function() {
-          const errorCode = video.error ? video.error.code : "tidak diketahui";
+        video.addEventListener("error", function () {
+          const errorCode = video.error
+            ? video.error.code
+            : "tidak diketahui";
 
           statusText.textContent =
-            "Video gagal diputar (kode " + errorCode +
-            "). Periksa URL atau gunakan file MP4 yang kompatibel.";
+            "Video gagal diputar (kode " + errorCode + ").";
 
           console.error("Video error:", video.error);
         });
@@ -252,51 +140,19 @@ if (Array.isArray(SHOPEE_LINKS) && SHOPEE_LINKS.length > 0) {
         video.src = selected.cdn;
         video.load();
 
-        video.addEventListener("loadedmetadata", function() {
+        video.addEventListener("loadedmetadata", function () {
           statusText.textContent = "";
         }, { once: true });
 
       } catch (error) {
         console.error(error);
+
         statusText.textContent =
           "Gagal memuat daftar video. Periksa videos.json.";
       }
     }
 
     loadVideo();
-
-// Tampilkan tombol iklan setelah video diputar 15 detik
-let iklanDitampilkan = false;
-
-video.addEventListener("timeupdate", function () {
-    if (iklanDitampilkan) return;
-
-    if (video.currentTime >= 15) {
-        iklanDitampilkan = true;
-
-        const tombol = document.createElement("a");
-        tombol.href = "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
-        tombol.target = "_blank";
-        tombol.rel = "noopener noreferrer";
-        tombol.textContent = "Kunjungi Sponsor";
-
-        tombol.style.cssText = 
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ff4fa3;
-            color: white;
-            padding: 14px 24px;
-            border-radius: 12px;
-            font-weight: bold;
-            text-decoration: none;
-            z-index: 9999;
-        ;
-
-        document.body.appendChild(tombol);
-    }
-});
   </script>
 
 </body>
