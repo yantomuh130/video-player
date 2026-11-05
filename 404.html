@@ -7,9 +7,7 @@
 <title>accimg</title>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html, body {
   margin: 0;
@@ -45,13 +43,11 @@ html, body {
   border-radius: 40px;
   text-decoration: none;
   font-size: 20px;
-  font-weight: 500;
 }
 
 .video-section {
   width: 100%;
   padding: 0 12px;
-  margin-top: 0;
 }
 
 .player-container {
@@ -59,7 +55,6 @@ html, body {
   max-width: 427px;
   margin: 0 auto;
   background: #000;
-  overflow: hidden;
 }
 
 video {
@@ -76,7 +71,7 @@ video {
   width: fit-content;
   text-align: center;
   margin: 35px auto 65px;
-  font-size: 27px;
+  font-size: 25px;
   color: #5279c4;
   text-decoration: none;
 }
@@ -96,23 +91,78 @@ video {
   padding: 20px;
 }
 
-@media (max-width: 480px) {
+/* POPUP */
+.popup-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(0,0,0,.72);
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+
+.popup-box {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  background: #191919;
+  border: 1px solid #333;
+  border-radius: 20px;
+  padding: 45px 25px 35px;
+  text-align: center;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(0,0,0,.5);
+}
+
+.popup-close {
+  position: absolute;
+  top: 12px;
+  right: 18px;
+  color: #aaa;
+  font-size: 28px;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+.popup-box h2 {
+  font-size: 25px;
+  margin: 5px 0 20px;
+}
+
+.popup-box p {
+  color: #bbb;
+  font-size: 17px;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+.popup-download {
+  display: block;
+  width: 100%;
+  padding: 19px 10px;
+  background: #ff4058;
+  color: white;
+  border-radius: 10px;
+  font-size: 20px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+@media (max-width:480px) {
   .header {
     height: 105px;
     padding: 15px 20px;
   }
 
-  .logo {
-    font-size: 34px;
-  }
+  .logo { font-size: 34px; }
 
   .upload {
     padding: 17px 35px;
     font-size: 19px;
-  }
-
-  .collection {
-    font-size: 25px;
   }
 }
 </style>
@@ -120,117 +170,135 @@ video {
 
 <body>
 
-<!-- HEADER -->
-
 <header class="header">
-
   <a class="logo" href="/">accimg</a>
 
-  <a
-    class="upload"
-    href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
-    target="_blank"
-    rel="sponsored noopener noreferrer">
+  <a class="upload"
+     href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
+     target="_blank"
+     rel="sponsored noopener noreferrer">
     Upload
   </a>
-
 </header>
 
-<!-- VIDEO PLAYER -->
-
 <section class="video-section">
-
   <main class="player-container">
-
-    <video
-      id="videoPlayer"
-      controls
-      playsinline
-      preload="metadata">
+    <video id="videoPlayer"
+           controls
+           playsinline
+           preload="metadata">
       Browser tidak mendukung pemutar video.
     </video>
-
   </main>
 
   <p id="status">Memuat video...</p>
-
 </section>
 
-<!-- COLLECTION -->
-
-<a
-  class="collection"
-  href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
-  target="_blank"
-  rel="sponsored noopener noreferrer">
+<a class="collection"
+   href="https://auctionr.org/4/082c0172cd3ad57615967c63448360ec"
+   target="_blank"
+   rel="sponsored noopener noreferrer">
   Cek koleksi lainnya
 </a>
 
-<footer class="footer">
-  Accimg
-</footer>
+<footer class="footer">Accimg</footer>
+
+<!-- POPUP DOWNLOAD -->
+<div class="popup-overlay" id="downloadPopup">
+  <div class="popup-box">
+
+    <button class="popup-close"
+            id="closePopup"
+            aria-label="Tutup">
+      &times;
+    </button>
+
+    <h2>Video Siap Diunduh</h2>
+
+    <p>
+      Silakan klik tombol di bawah untuk melanjutkan
+      dan mengunduh file video kualitas HD.
+    </p>
+
+    <button class="popup-download" id="downloadButton">
+      Download Video
+    </button>
+
+  </div>
+</div>
 
 <script>
-
-// =================================
-// KONFIGURASI ADSTERRA
-// =================================
-
 const ADSTERRA_LINK =
-"https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
-
-// =================================
-// ELEMENT
-// =================================
+  "https://auctionr.org/4/082c0172cd3ad57615967c63448360ec";
 
 const video = document.getElementById("videoPlayer");
 const statusText = document.getElementById("status");
+const popup = document.getElementById("downloadPopup");
+const closeButton = document.getElementById("closePopup");
+const downloadButton = document.getElementById("downloadButton");
 
-// =================================
-// AMBIL ID VIDEO DARI URL
-// =================================
+const filename = new URLSearchParams(
+  window.location.search
+).get("f");
 
-// Contoh:
-// cdn.accimg.cam/fQklWM9Z1.mp4
-// ID = fQklWM9Z1
+const expectedID = filename
+  ? "upload/?f=" + filename
+  : "";
 
-const rawPath = decodeURIComponent(
-  window.location.pathname.replace(/^\/+/, "")
-);
+const videoKey = "accimg_" + (filename || "unknown");
+const timeKey = videoKey + "_time";
+const popupKey = videoKey + "_popup";
+const playingKey = videoKey + "_playing";
 
-const videoID = rawPath.replace(/\.mp4$/i, "");
+let popupShown = sessionStorage.getItem(popupKey) === "yes";
+let savedTime = Number(sessionStorage.getItem(timeKey) || 0);
 
-// =================================
-// REDIRECT SETELAH 15 DETIK
-// VIDEO DIPUTAR
-// =================================
-
-let redirected = false;
-
-video.addEventListener("timeupdate", function() {
-
-  if (redirected) return;
-
-  if (video.currentTime >= 15) {
-
-    redirected = true;
-
-    window.location.href = ADSTERRA_LINK;
-
+// Simpan posisi video dan status pemutaran.
+function saveVideoState() {
+  if (Number.isFinite(video.currentTime)) {
+    sessionStorage.setItem(timeKey, video.currentTime);
   }
 
+  sessionStorage.setItem(
+    playingKey,
+    video.paused ? "no" : "yes"
+  );
+}
+
+window.addEventListener("pagehide", saveVideoState);
+
+// Popup muncul satu kali setelah 20 detik pemutaran.
+video.addEventListener("timeupdate", function () {
+  if (!popupShown && video.currentTime >= 20) {
+    popupShown = true;
+
+    sessionStorage.setItem(popupKey, "yes");
+    saveVideoState();
+
+    video.pause();
+    popup.style.display = "flex";
+  }
 });
 
-// =================================
-// LOAD VIDEOS.JSON
-// =================================
+// Kedua tombol menuju Adsterra.
+function goToAdsterra() {
+  saveVideoState();
+  sessionStorage.setItem(popupKey, "yes");
 
+  popup.style.display = "none";
+
+  window.location.href = ADSTERRA_LINK;
+}
+
+closeButton.addEventListener("click", goToAdsterra);
+downloadButton.addEventListener("click", goToAdsterra);
+
+// Muat video dari videos.json.
 async function loadVideo() {
-
   try {
-
-    if (!videoID) {
-      statusText.textContent = "Video tidak ditemukan.";
+    if (!filename ||
+        !/^[a-zA-Z0-9]{8}\.mp4$/i.test(filename)) {
+      statusText.textContent = "Format atau ID video tidak valid.";
       return;
     }
 
@@ -245,57 +313,51 @@ async function loadVideo() {
     const data = await response.json();
 
     if (!Array.isArray(data.videos)) {
-      throw new Error("Format videos.json tidak valid");
+      throw new Error("Format videos.json tidak valid.");
     }
 
-    const selected = data.videos.find(function(item) {
-
-      const itemID = String(item.id || "")
-        .replace(/\.mp4$/i, "");
-
-      return itemID === videoID;
-
+    const selected = data.videos.find(function (item) {
+      return String(item.id || "") === expectedID;
     });
 
     if (!selected || !selected.cdn) {
-
       statusText.textContent = "Video tidak ditemukan.";
-
       return;
     }
 
-    video.addEventListener("error", function() {
-
-      statusText.textContent =
-        "Video gagal diputar. Periksa URL sumber video.";
-
+    video.addEventListener("error", function () {
+      statusText.textContent = "Video gagal diputar. Periksa URL sumber.";
     });
 
-    video.addEventListener("loadedmetadata", function() {
-
+    video.addEventListener("loadedmetadata", function () {
       statusText.textContent = "";
 
+      if (savedTime > 0 && savedTime < video.duration) {
+        video.currentTime = savedTime;
+      }
+
+      if (popupShown) {
+        popup.style.display = "none";
+      }
     }, { once: true });
 
     video.src = selected.cdn;
-
     video.load();
 
-  } catch(error) {
-
+  } catch (error) {
     console.error(error);
-
-    statusText.textContent =
-      "Gagal memuat video. Periksa videos.json.";
-
+    statusText.textContent = "Gagal memuat video. Periksa videos.json.";
   }
-
 }
 
-// JALANKAN
+// Tangani pengunjung yang kembali ke halaman.
+window.addEventListener("pageshow", function () {
+  if (popupShown) {
+    popup.style.display = "none";
+  }
+});
 
 loadVideo();
-
 </script>
 
 </body>
